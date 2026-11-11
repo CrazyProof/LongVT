@@ -31,6 +31,16 @@ the verified CUDA 12.4 environment.
 
 The final line must be `MEDIA_COVERAGE_OK`.
 
+Alternatively, run the complete config, model, media, and smoke-processing
+preflight:
+
+```bash
+/data/caojingqi/lmms-engine/.venv/bin/python \
+  /data/caojingqi/LongVT/scripts/sft/preflight.py
+```
+
+The final line must be `SFT_PREFLIGHT_OK`.
+
 ## Prepare and run smoke
 
 ```bash
