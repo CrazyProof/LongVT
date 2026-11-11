@@ -1,3 +1,4 @@
+import json
 import re
 import os
 
@@ -346,15 +347,26 @@ def llm_as_judge_sync(predict_str, ground_truth, extra_info):
         "messages": [
             {"role": "user", "content": [{"type": "text", "text": prompt}]},
         ],
-        "max_tokens": 5,
+        "max_tokens": int(os.getenv("JUDGE_MAX_TOKENS", "5")),
         "model": MODEL_NAME,
     }
+    # 思考型模型（DeepSeek 默认开、Qwen3 混合模型等）会把 5 个 token 全花在
+    # 推理上，content 返回空串 -> 静默判 0。用 JUDGE_EXTRA_BODY 传关闭参数，
+    # 例如 DeepSeek: JUDGE_EXTRA_BODY='{"thinking": {"type": "disabled"}}'
+    extra_body = os.getenv("JUDGE_EXTRA_BODY", "").strip()
+    if extra_body:
+        payload["extra_body"] = json.loads(extra_body)
     response = client.chat.completions.create(**payload)
-    try:
-        score = int(response.choices[0].message.content)
-    except Exception:
-        score = 0
-    return score
+    raw = (response.choices[0].message.content or "").strip()
+    if os.getenv("JUDGE_DEBUG") == "1":
+        print(f"[judge] raw={raw!r} pred={predict_str[:60]!r}")
+    # 容忍 "1" / "1." / " 0 " 这类输出；拿不到 1/0 才记 0
+    m = re.search(r"[01](?!\d)", raw)
+    if m is None:
+        if os.getenv("JUDGE_DEBUG") == "1":
+            print(f"[judge] 解析失败，raw={raw!r} -> 记 0")
+        return 0
+    return int(m.group(0))
 
 
 def compute_score(data_source, solution_str, ground_truth, extra_info=None, sandbox_fusion_url=None, concurrent_semaphore=None):

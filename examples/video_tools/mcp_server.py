@@ -75,6 +75,26 @@ def crop_video(
         logger.error(f"Empty video_path parameter: '{video_path}'")
         raise ValueError("video_path cannot be empty")
 
+    # 训练数据里模型只写 basename（"The Video path for this video is: xxx.mp4"），
+    # 这里把它解析成基准测试目录下的绝对路径。
+    if not os.path.exists(video_path):
+        _vdir = os.getenv("LONGVT_VIDEO_DIR", "/data/caojingqi/huggingface/longvt_benchmark")
+        _base = os.path.basename(video_path)
+        _cand = os.path.join(_vdir, _base)
+        if os.path.exists(_cand):
+            logger.info(f"Resolved video_path {video_path!r} -> {_cand!r}")
+            video_path = _cand
+        else:
+            # 模型偶尔把大小写写错（iP5k10iCOlE -> ip5k10icole），做一次忽略大小写的唯一匹配
+            try:
+                _hits = [f for f in os.listdir(_vdir) if f.lower() == _base.lower()]
+            except OSError:
+                _hits = []
+            if len(_hits) == 1:
+                _cand = os.path.join(_vdir, _hits[0])
+                logger.info(f"Resolved video_path by case-insensitive match {video_path!r} -> {_cand!r}")
+                video_path = _cand
+
     if start_time < 0:
         logger.error(f"Invalid start_time: {start_time}")
         raise ValueError(f"start_time must be non-negative, got {start_time}")
@@ -113,7 +133,9 @@ def crop_video(
             "min_frames": 1,
             "max_frames": 128,
             "min_pixels": 28 * 28,
-            "max_pixels": 224 * 224,
+            # 训练侧的裁剪帧是按 360*420=151200 像素抽的（见 LongVT/data/utils.py 的
+            # MAX_PIXELS），这里对齐它；224*224 会让“放大看细节”这一步拿不到细节。
+            "max_pixels": int(os.getenv("LONGVT_CROP_MAX_PIXELS", str(360 * 420))),
             "video_start": start_time,
             "video_end": end_time,
         }
