@@ -7,6 +7,18 @@
 - Annotations: `/data/caojingqi/LongVT/data/annotations`
 - Media root: `/data/caojingqi/LongVT/media`
 
+Verified runtime:
+
+```text
+Python        3.11.17
+PyTorch       2.6.0+cu124
+torchvision   0.21.0+cu124
+Triton        3.2.0
+Transformers  5.5.0
+DeepSpeed     0.18.9
+FlashAttention 2.7.4.post1
+```
+
 Do not run `uv sync` in `lmms-engine`; the current `uv.lock` does not describe
 the verified CUDA 12.4 environment.
 
