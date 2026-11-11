@@ -28,7 +28,6 @@ model_config:
 
 trainer_args:
   output_dir: /data/caojingqi/LongVT/runs/sft-smoke
-  overwrite_output_dir: true
   per_device_train_batch_size: 1
   learning_rate: 5.0e-05
   weight_decay: 0.0
