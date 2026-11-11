@@ -56,6 +56,13 @@ CUDA_VISIBLE_DEVICES=1,5 \
 The smoke run performs two optimizer steps, writes a model-only checkpoint,
 and stores logs under `/data/caojingqi/LongVT/runs`.
 
+Alternatively, wait until two GPUs each have at least 20 GiB free and launch
+the smoke automatically:
+
+```bash
+/data/caojingqi/LongVT/scripts/sft/wait_for_gpus_and_run_smoke.sh
+```
+
 ## Run full SFT
 
 Start with all eight GPUs idle:
