@@ -75,5 +75,18 @@ Start with all eight GPUs idle:
   8
 ```
 
-The eight-GPU configuration uses conservative 16K packing and 128 video
+The eight-GPU configuration uses conservative 8K packing and 64 video
 frames. It is not a reproduction of the 51.2K/512-frame configuration.
+
+Before a long run, exercise the full datasets and packing path with the
+ten-step stability configuration:
+
+```bash
+CUDA_VISIBLE_DEVICES=0,1,2,3,4,5 \
+  /data/caojingqi/LongVT/scripts/sft/run_sft.sh \
+  /data/caojingqi/LongVT/examples/sft/local/longvt_7b_sft_stability.yaml \
+  6
+```
+
+The verified result is documented in
+[STABILITY_REPORT.md](STABILITY_REPORT.md).

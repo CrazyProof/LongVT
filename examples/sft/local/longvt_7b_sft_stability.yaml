@@ -1,0 +1,84 @@
+trainer_type: fsdp2_trainer
+
+dataset_config:
+  dataset_type: vision_iterable
+  dataset_format: yaml
+  datasets:
+    - path: /data/caojingqi/LongVT/data/annotations/longvt_sft_geminicot_4k8.parquet
+      data_folder: /data/caojingqi/LongVT/media
+      data_type: parquet
+    - path: /data/caojingqi/LongVT/data/annotations/longvt_sft_geminicot_4k8.parquet
+      data_folder: /data/caojingqi/LongVT/media
+      data_type: parquet
+    - path: /data/caojingqi/LongVT/data/annotations/longvt_sft_longvideoreason_5k2.parquet
+      data_folder: /data/caojingqi/LongVT/media
+      data_type: parquet
+    - path: /data/caojingqi/LongVT/data/annotations/longvt_sft_videor1_165k5.parquet
+      data_folder: /data/caojingqi/LongVT/media
+      data_type: parquet
+    - path: /data/caojingqi/LongVT/data/annotations/longvt_sft_tvg_6k3.parquet
+      data_folder: /data/caojingqi/LongVT/media
+      data_type: parquet
+    - path: /data/caojingqi/LongVT/data/annotations/longvt_sft_longvideoreflection_3k.parquet
+      data_folder: /data/caojingqi/LongVT/media
+      data_type: parquet
+    - path: /data/caojingqi/LongVT/data/annotations/longvt_sft_llavacot_54k5.parquet
+      data_folder: /data/caojingqi/LongVT/media
+      data_type: parquet
+    - path: /data/caojingqi/LongVT/data/annotations/longvt_sft_openvlthinker_2k8.parquet
+      data_folder: /data/caojingqi/LongVT/media
+      data_type: parquet
+    - path: /data/caojingqi/LongVT/data/annotations/longvt_sft_wemath_602.parquet
+      data_folder: /data/caojingqi/LongVT/media
+      data_type: parquet
+  processor_config:
+    processor_name: /data/caojingqi/LongVT/models/Qwen2.5-VL-7B-Instruct
+    processor_type: qwen2_5_vl
+    extra_kwargs:
+      image_max_pixels: 50176
+      video_max_pixels: 50176
+  packing: true
+  packing_strategy: first_fit
+  packing_length: 8192
+  filter_overlong: true
+  video_backend: qwen_vl_utils
+  video_sampling_strategy: fps
+  video_max_pixels: 50176
+  video_max_frames: 64
+
+model_config:
+  load_from_pretrained_path: /data/caojingqi/LongVT/models/Qwen2.5-VL-7B-Instruct
+  attn_implementation: flash_attention_2
+
+trainer_args:
+  output_dir: /data/caojingqi/LongVT/runs/sft-stability
+  per_device_train_batch_size: 1
+  learning_rate: 5.0e-05
+  weight_decay: 0.0
+  gradient_accumulation_steps: 1
+  gradient_checkpointing: true
+  num_train_epochs: 1
+  max_steps: 10
+  save_steps: 10
+  save_total_limit: 1
+  save_only_model: true
+  report_to: none
+  run_name: longvt_7b_sft_stability
+  eval_strategy: "no"
+  logging_steps: 1
+  dataloader_num_workers: 0
+  dataloader_persistent_workers: false
+  dataloader_prefetch_factor: null
+  bf16: true
+  lr_scheduler_type: cosine
+  warmup_ratio: 0.1
+  use_liger_kernel: true
+  use_rmpad: true
+  torch_empty_cache_steps: 10
+  fsdp2: true
+  fsdp_config:
+    transformer_layer_cls_to_wrap:
+      - Qwen2_5_VLDecoderLayer
+    reshard_after_forward: true
+  sp_ulysses_degree: 1
+  enable_profiler: false
