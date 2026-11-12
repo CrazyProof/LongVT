@@ -41,6 +41,8 @@ preflight:
 
 The final line must be `SFT_PREFLIGHT_OK`.
 
+The verified two-step result is documented in [SMOKE_REPORT.md](SMOKE_REPORT.md).
+
 ## Prepare and run smoke
 
 ```bash
