@@ -1,5 +1,7 @@
 import re
 import os
+import json
+import time
 
 from math_verify import parse, verify
 from openai import OpenAI
@@ -79,7 +81,7 @@ def extract_boxed_answer(predict_str: str) -> str:
     # Find all occurrences of \boxed{
     boxed_start = "\\boxed{"
     start_indices = []
-    
+
     # Find all positions where \boxed{ starts
     pos = 0
     while True:
@@ -346,15 +348,35 @@ def llm_as_judge_sync(predict_str, ground_truth, extra_info):
         "messages": [
             {"role": "user", "content": [{"type": "text", "text": prompt}]},
         ],
-        "max_tokens": 5,
+        "max_tokens": int(os.getenv("JUDGE_MAX_TOKENS", "8")),
+        "temperature": float(os.getenv("JUDGE_TEMPERATURE", "0")),
         "model": MODEL_NAME,
     }
-    response = client.chat.completions.create(**payload)
-    try:
-        score = int(response.choices[0].message.content)
-    except Exception:
-        score = 0
-    return score
+    extra_body = os.getenv("JUDGE_EXTRA_BODY", "").strip()
+    if extra_body:
+        payload["extra_body"] = json.loads(extra_body)
+
+    retries = int(os.getenv("JUDGE_RETRIES", "3"))
+    for attempt in range(1, retries + 1):
+        try:
+            response = client.chat.completions.create(**payload)
+        except Exception as error:  # noqa: BLE001
+            if attempt == retries:
+                print(
+                    f"[judge] request failed after {retries} attempts "
+                    f"({type(error).__name__}: {str(error)[:160]})"
+                )
+                return 0
+            time.sleep(2 * attempt)
+            continue
+
+        raw = (response.choices[0].message.content or "").strip()
+        match = re.search(r"[01](?!\d)", raw)
+        if match is not None:
+            return int(match.group(0))
+        print(f"[judge] unparseable response: {raw[:80]!r}")
+        return 0
+    return 0
 
 
 def compute_score(data_source, solution_str, ground_truth, extra_info=None, sandbox_fusion_url=None, concurrent_semaphore=None):
@@ -406,4 +428,4 @@ def compute_score(data_source, solution_str, ground_truth, extra_info=None, sand
     }
 
     return score_dict
-    
+

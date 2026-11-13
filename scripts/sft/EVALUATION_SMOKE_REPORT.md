@@ -54,3 +54,18 @@ uses the base model's compatible metadata files; tensor values are unchanged.
 Renew or replace the judge API credential in `/data/caojingqi/judge.env`.
 Run a judge preflight before a full evaluation so authentication failures
 cannot be silently converted to zero accuracy.
+
+Inference can proceed while the judge is unavailable by setting
+`INFERENCE_ONLY=1` in the evaluation client. Saved generations can later be
+rescored without loading the model:
+
+```bash
+set -a
+source /data/caojingqi/judge.env
+set +a
+
+/data/caojingqi/lmms-eval/.venv/bin/python \
+  scripts/sft/rejudge_samples.py \
+  --samples /path/to/20261113_141636_samples_longvt.jsonl \
+  --workers 8
+```
