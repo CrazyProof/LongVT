@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "Video Tools MCP Server": {
+      "command": "/data/caojingqi/lmms-eval/.venv/bin/python",
+      "args": [
+        "/data/caojingqi/LongVT/examples/video_tools/mcp_server.py"
+      ]
+    }
+  }
+}

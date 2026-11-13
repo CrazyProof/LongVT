@@ -75,6 +75,14 @@ def crop_video(
         logger.error(f"Empty video_path parameter: '{video_path}'")
         raise ValueError("video_path cannot be empty")
 
+    if not os.path.exists(video_path) and not os.path.isabs(video_path):
+        video_dir = os.getenv("LONGVT_VIDEO_DIR")
+        if video_dir:
+            candidate = os.path.join(video_dir, os.path.basename(video_path))
+            if os.path.exists(candidate):
+                logger.info(f"Resolved video_path {video_path!r} -> {candidate!r}")
+                video_path = candidate
+
     if start_time < 0:
         logger.error(f"Invalid start_time: {start_time}")
         raise ValueError(f"start_time must be non-negative, got {start_time}")
