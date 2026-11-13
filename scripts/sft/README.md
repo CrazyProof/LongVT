@@ -93,3 +93,17 @@ The verified result is documented in
 
 The completed 3000-step run is documented in
 [TRAINING_REPORT.md](TRAINING_REPORT.md).
+
+## Local evaluation runner
+
+Use the repository-local runner for repeatable Base / SFT / RFT comparisons:
+
+```bash
+GPU=5 PROCS=4 LIMIT=5 MAX_FRAMES=64 INFERENCE_ONLY=1 \
+  scripts/sft/run_local_eval.sh /path/to/model
+```
+
+Omit `LIMIT` for the full 652-example benchmark and set
+`INFERENCE_ONLY=0` to require the configured LLM judge. The runner starts a
+local vLLM server, waits for its health endpoint, runs the LongVT tool task,
+and stops the server on exit.
