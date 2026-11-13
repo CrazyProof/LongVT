@@ -42,3 +42,15 @@ export LONGVT_MCP_MAX_FRAMES=64
 The full official GRPO script targets 8 nodes x 8 GPUs. A local single-node
 smoke should be prepared only after the full SFT evaluation and comparison
 baselines are complete.
+
+The conservative smoke launcher is:
+
+```bash
+LLM_AS_A_JUDGE_BASE=http://<judge-host>:<port>/v1 \
+  bash examples/video_tools/local/longvt_7b_rl_smoke.sh
+```
+
+It defaults to two optimizer steps, two rollouts per prompt, an 8K prompt cap,
+a 2K response cap, and at most two assistant/tool turns. It uses vLLM rollout
+by default because the current environment has vLLM but not SGLang. Set
+`ROLLOUT_NAME=sglang` when the official SGLang environment is installed.
