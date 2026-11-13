@@ -107,3 +107,7 @@ Omit `LIMIT` for the full 652-example benchmark and set
 `INFERENCE_ONLY=0` to require the configured LLM judge. The runner starts a
 local vLLM server, waits for its health endpoint, runs the LongVT tool task,
 and stops the server on exit.
+
+The evaluation client environment must include `decord==0.6.0`. PyAV remains
+the primary video backend, but a small number of videos trigger an AV decode
+error and require Decord as the fallback.
