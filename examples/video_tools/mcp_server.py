@@ -111,7 +111,7 @@ def crop_video(
             "video": f"file://{video_path}",
             "fps": 1,  # 1fps
             "min_frames": 1,
-            "max_frames": 128,
+            "max_frames": int(os.getenv("LONGVT_MCP_MAX_FRAMES", "128")),
             "min_pixels": 28 * 28,
             "max_pixels": 224 * 224,
             "video_start": start_time,
