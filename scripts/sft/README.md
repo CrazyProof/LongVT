@@ -90,3 +90,6 @@ CUDA_VISIBLE_DEVICES=0,1,2,3,4,5 \
 
 The verified result is documented in
 [STABILITY_REPORT.md](STABILITY_REPORT.md).
+
+The completed 3000-step run is documented in
+[TRAINING_REPORT.md](TRAINING_REPORT.md).
