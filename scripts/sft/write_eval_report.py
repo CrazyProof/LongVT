@@ -27,6 +27,13 @@ def main() -> None:
         "<tool_call>" in str(row.get("filtered_resps") or row.get("resps") or "")
         for row in rows
     )
+    tool_errors = sum(
+        any(
+            marker in str(row.get("filtered_resps") or row.get("resps") or "")
+            for marker in ("Tool execution failed", "Video file not found", "Error code:")
+        )
+        for row in rows
+    )
     answer_tags = sum(
         "<answer>" in str(row.get("filtered_resps") or row.get("resps") or "")
         and "</answer>" in str(row.get("filtered_resps") or row.get("resps") or "")
@@ -57,6 +64,7 @@ Examples:          {summary["count"]}
 Accuracy:          {summary["acc_score"]:.4f}
 Format score:      {summary["format_score"]:.4f}
 Tool calls:        {tool_calls} / {len(rows)}
+Tool errors:       {tool_errors} / {len(rows)}
 Complete answers:  {answer_tags} / {len(rows)}
 Input tokens:      {sum(int(item.get("input_tokens", 0)) for item in token_counts)}
 Output tokens:     {sum(int(item.get("output_tokens", 0)) for item in token_counts)}
