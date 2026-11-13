@@ -54,3 +54,17 @@ It defaults to two optimizer steps, two rollouts per prompt, an 8K prompt cap,
 a 2K response cap, and at most two assistant/tool turns. It uses vLLM rollout
 by default because the current environment has vLLM but not SGLang. Set
 `ROLLOUT_NAME=sglang` when the official SGLang environment is installed.
+
+## Dedicated environment
+
+Do not modify the `longvt` conda environment while it is serving evaluation.
+Create the official RL environment separately:
+
+```bash
+bash scripts/rl/create_env.sh --dry-run
+bash scripts/rl/create_env.sh
+```
+
+The script refuses to overwrite an existing environment and uses the official
+Torch 2.6 / SGLang 0.4.6.post5 / FlashAttention 2.7.4 stack with Megatron
+disabled for the first single-node smoke.
