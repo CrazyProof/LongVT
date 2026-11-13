@@ -31,9 +31,18 @@ Final grad norm: 2.421875
 ```
 
 The run completed without OOM or data-path failures. The final FSDP2 checkpoint
-was merged into a standard Hugging Face model and verified to contain 729
-tensors. A short image-generation inference completed successfully on one
-RTX 4090.
+was merged into a standard Hugging Face model.
+
+The first merge used `model.visual.*` keys for the 390 vision tensors, whereas
+Hugging Face and vLLM expect `visual.*`. The text weights were already correct.
+`fix_merged_hf_keys.py` normalized the vision prefix without changing tensor
+values. The corrected checkpoint has exactly the same 729 keys as the base
+model, and vLLM 0.8.3 loaded all weights successfully on one RTX 4090.
+
+Transformers 5.5 metadata (`text_config`, tokenizer and processor layouts) is
+not readable by the pinned vLLM/Transformers 4.51 evaluation server. The final
+model therefore uses the base model's compatible metadata layout. The original
+Transformers 5 metadata files are retained with a `.bak` suffix.
 
 ## Final model
 
