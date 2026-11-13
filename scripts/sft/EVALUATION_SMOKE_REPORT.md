@@ -5,8 +5,7 @@ Date: 2026-11-13
 ## Scope
 
 This smoke test validates the post-training inference path. It is not a
-benchmark score because only five examples were used and the external judge
-credentials had expired.
+benchmark score because only five examples were used.
 
 ```text
 Model: /data/caojingqi/LongVT/runs/longvt_7b_sft_8gpu_20261112_120910/merged-hf
@@ -27,7 +26,8 @@ Input tokens:    37,777
 Output tokens:   1,841
 Tool use:        3 / 5 samples
 Format score:    0.64
-Accuracy:        invalid (external judge returned HTTP 401)
+Accuracy:        0.00 (0 / 5)
+Judge:           DeepSeek-V4.1-Flash
 ```
 
 The model produced both `<think>` and `<answer>` content in all five samples.
@@ -51,8 +51,7 @@ uses the base model's compatible metadata files; tensor values are unchanged.
 
 ## Required follow-up
 
-Renew or replace the judge API credential in `/data/caojingqi/judge.env`.
-Run a judge preflight before a full evaluation so authentication failures
+Run the judge preflight before a full evaluation so authentication failures
 cannot be silently converted to zero accuracy.
 
 Inference can proceed while the judge is unavailable by setting
