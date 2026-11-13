@@ -94,6 +94,9 @@ The verified result is documented in
 The completed 3000-step run is documented in
 [TRAINING_REPORT.md](TRAINING_REPORT.md).
 
+The completed 652-example conservative evaluation is documented in
+[FULL_EVAL_REPORT.md](FULL_EVAL_REPORT.md).
+
 ## Local evaluation runner
 
 Use the repository-local runner for repeatable Base / SFT / RFT comparisons:
@@ -111,3 +114,23 @@ and stops the server on exit.
 The evaluation client environment must include `decord==0.6.0`. PyAV remains
 the primary video backend, but a small number of videos trigger an AV decode
 error and require Decord as the fallback.
+
+## Repair incomplete full-evaluation samples
+
+Rerun only the failed document IDs, then merge the successful rows back by
+`doc_id`:
+
+```bash
+/data/caojingqi/lmms-eval/.venv/bin/python \
+  scripts/sft/merge_repair_samples.py \
+  --base /path/to/full_samples.jsonl \
+  --replacement /path/to/repair-1_samples.jsonl \
+                /path/to/repair-2_samples.jsonl \
+  --output /path/to/canonical_samples.jsonl \
+  --expected-count 652
+```
+
+The merge fails on duplicate or unknown document IDs, request failures, and
+answers without a complete `<answer>...</answer>` block. Recompute all scores
+from the canonical file with `rejudge_samples.py`; do not average scores from
+separate repair runs.
