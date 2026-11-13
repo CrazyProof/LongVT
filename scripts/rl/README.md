@@ -68,3 +68,17 @@ bash scripts/rl/create_env.sh
 The script refuses to overwrite an existing environment and uses the official
 Torch 2.6 / SGLang 0.4.6.post5 / FlashAttention 2.7.4 stack with Megatron
 disabled for the first single-node smoke.
+
+## RFT smoke
+
+After GRPO completes, update `model_config.load_from_pretrained_path` in
+`examples/rft/local/longvt_7b_rft_smoke.yaml` to the final RL checkpoint and
+run:
+
+```bash
+scripts/sft/run_sft.sh examples/rft/local/longvt_7b_rft_smoke.yaml 4
+```
+
+This 8K/64-frame, ten-step configuration validates the 15.4K self-trace data
+stream on 24 GB GPUs. Full paper RFT still requires the 51.2K/512-frame
+configuration and substantially more GPU memory.
